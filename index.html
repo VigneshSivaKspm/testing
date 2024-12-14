@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Menu with Snake Effect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+
+    <style>
+        /* General reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(45deg, rgba(0, 128, 0, 1) 0%, rgba(0, 102, 0, 1) 40%, rgba(0, 51, 0, 1) 70%, rgba(0, 0, 0, 1) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Main menu container */
+        #main-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            top: 8%;
+        }
+
+        /* Image behind the buttons */
+        #background-image {
+            position: absolute;
+            height: 50%;
+            width: 50%;
+            margin-left: 12%;
+            background-image: url('img/snake.png');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+
+        /* Menu buttons */
+        #main-menu button {
+            font-family: 'Bungee', sans-serif;
+            background: linear-gradient(45deg, #000000, #00ff0d);
+            color: white;
+            border: none;
+            padding: 3vw 10vw;
+            font-size: 8vw;
+            border: 1px solid black;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(0);
+            margin: 10px 0;
+        }
+
+        /* Remove spacing between elements */
+        .menu-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu-group button {
+            margin: 0;
+        }
+
+        /* Hover effect */
+        #main-menu button:hover {
+            background: linear-gradient(45deg, #00ff0d, #000000);
+            transform: translateY(-8px);
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 3D Hover Effect */
+        #main-menu button:active {
+            transform: translateY(4px);
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Background Music */
+        audio {
+            display: none;
+        }
+
+        #footer {
+            position: absolute;
+            bottom: 10px;
+            /* Distance from the bottom */
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 3vw;
+            z-index: 1;
+        }
+
+        #footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Image -->
+    <div id="background-image"></div>
+    <div id="main-menu">
+        <!-- Play Game Button Group -->
+        <div class="menu-group">
+            <button onclick="window.location.href='game.html'">Play</button>
+        </div>
+        <!-- Sign Up-->
+        <div class="menu-group">
+            <button onclick="window.location.href='signup.html'">Sign In</button>
+        </div>
+        <!-- High Scores Button Group -->
+        <div class="menu-group">
+            <button onclick="window.location.href='highscores.html'">Legends</button>
+        </div>
+    </div>
+
+    <!-- Background Music Audio Element -->
+    <audio id="background-music" autoplay loop muted>
+        <source src="sounds/theme.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+    <div id="footer">
+        <p>&#169; <span id="year"></span> LegendaryOne. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Set up Web Audio API to ensure autoplay works on page load
+        const audio = document.getElementById('background-music');
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaElementSource(audio);
+        const yearElement = document.getElementById("year");
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+
+        analyser.fftSize = 256; // Set the FFT size (frequency data resolution)
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        // Function to start audio when page loads
+        window.onload = function () {
+            // Set the current year dynamically
+            const currentYear = new Date().getFullYear();
+            yearElement.textContent = currentYear;
+            audio.play();
+            audioContext.resume(); // Ensure the audio context is resumed on load
+            audio.muted = false; // Unmute the audio after the page loads
+            updateBackground(); // Start the background animation
+        };
+
+        // Function to update the background image based on the audio data
+        function updateBackground() {
+            analyser.getByteFrequencyData(dataArray);
+
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                sum += dataArray[i];
+            }
+            const average = sum / bufferLength;
+
+            // Map the average frequency to an effect on the background image
+            const scale = 1 + (average / 160) * 1; // Scale the background image
+
+            const backgroundImage = document.getElementById('background-image');
+            backgroundImage.style.transform = `scale(${scale})`;
+
+            requestAnimationFrame(updateBackground);
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Scores</title>
+</head>
+<style>
+    /* Styles for the page (same as before) */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(45deg, rgba(0, 128, 0, 1) 0%, rgba(0, 102, 0, 1) 40%, rgba(0, 51, 0, 1) 70%, rgba(0, 0, 0, 1) 100%);
+        color: #fff;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .back-button {
+        position: absolute;
+        top: 6vw;
+        left: 6vw;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .back-button svg {
+        width: 30px;
+        height: 30px;
+        fill: #fff;
+    }
+
+    .back-button:hover {
+        transform: scale(1.1);
+    }
+
+    .title {
+        margin: 20px 0;
+        font-size: 8vw;
+        font-weight: bold;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .tabs {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .tab {
+        padding: 4vw 12vw;
+        background: #43a047;
+        color: white;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .tab.active {
+        background: #1b5e20;
+        transform: translateY(-3px);
+    }
+
+    .tab:hover {
+        background: #388e3c;
+        transform: translateY(-3px);
+    }
+
+    .table-container {
+        width: 82%;
+        max-width: 600px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: linear-gradient(to bottom right, #00ff0d, #ffffff);
+        border-radius: 6px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        color: rgb(255, 255, 255);
+        padding: 5%;
+        margin-bottom: 4%;
+    }
+
+    table {
+        width: 80%;
+        border-collapse: collapse;
+        margin-top: 1%;
+        margin-bottom: 1%;
+    }
+
+    table th,
+    table td {
+        padding: 15px;
+        text-align: center;
+        border: 0.5px solid #333333;
+        font-size: 16px;
+    }
+
+    table th {
+        font-weight: bold;
+        color: #000000;
+        background: #ffffff;
+        text-transform: uppercase;
+        box-shadow: inset 0 -2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    table tbody tr:nth-child(odd) {
+        background: linear-gradient(45deg, rgba(0, 128, 0, 1) 0%, rgba(0, 102, 0, 1) 40%, rgba(0, 51, 0, 1) 70%, rgba(0, 0, 0, 1) 100%);
+    }
+
+    table tbody tr:nth-child(even) {
+        background: linear-gradient(45deg, rgba(0, 0, 0, 1) 0%, rgba(0, 51, 0, 1) 30%, rgba(0, 102, 0, 1) 60%, rgba(0, 128, 0, 1) 100%);
+    }
+
+    table tbody tr:hover {
+        background: #4caf50;
+    }
+</style>
+
+<body>
+    <button class="back-button" onclick="location.href='index.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+        </svg>
+    </button>
+
+    <h1 class="title">Legends</h1>
+
+    <div class="tabs">
+        <div class="tab active" id="local-tab" onclick="switchTab('local')">Local</div>
+        <div class="tab" id="global-tab" onclick="switchTab('global')">Global</div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="scoreTable">
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { db } from './js/firebaseConfig.js';
+        import { collection, query, orderBy, getDocs, addDoc, updateDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/9.11.0/firebase-firestore.js";
+
+        function switchTab(tab) {
+            const localTab = document.getElementById('local-tab');
+            const globalTab = document.getElementById('global-tab');
+            const scoreTable = document.getElementById('scoreTable');
+
+            localTab.classList.remove('active');
+            globalTab.classList.remove('active');
+
+            if (tab === 'local') {
+                localTab.classList.add('active');
+                populateScores('local');
+            } else if (tab === 'global') {
+                globalTab.classList.add('active');
+                populateScores('global');
+            }
+        }
+
+        function populateScores(type) {
+            const scoreTable = document.getElementById('scoreTable');
+            let scores = [];
+
+            if (type === 'local') {
+                scores = JSON.parse(localStorage.getItem('allScores')) || [];
+                scores.sort((a, b) => b.score - a.score);
+            } else if (type === 'global') {
+                getGlobalScoresFromFirebase();
+                return;
+            }
+
+            scoreTable.innerHTML = '';
+
+            if (scores.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="3">No scores available.</td>';
+                scoreTable.appendChild(row);
+            } else {
+                scores.forEach((score, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${index + 1}</td><td>${score.username}</td><td>${score.score}</td>`;
+                    scoreTable.appendChild(row);
+                });
+            }
+        }
+
+        async function getGlobalScoresFromFirebase() {
+            const highscoresRef = collection(db, "highscores");
+            const q = query(highscoresRef, orderBy("score", "desc"));
+            try {
+                const snapshot = await getDocs(q);
+
+                const userScores = {};
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const username = data.username;
+                    const score = data.score;
+                    if (!userScores[username] || userScores[username].score < score) {
+                        userScores[username] = { score: score };
+                    }
+                });
+
+                const sortedScores = Object.entries(userScores)
+                    .map(([username, scoreData]) => ({
+                        username: username,
+                        score: scoreData.score
+                    }))
+                    .sort((a, b) => b.score - a.score);
+
+                const scoreTable = document.getElementById("scoreTable");
+                scoreTable.innerHTML = "";
+
+                if (sortedScores.length === 0) {
+                    const row = document.createElement("tr");
+                    row.innerHTML = '<td colspan="3">No global scores available.</td>';
+                    scoreTable.appendChild(row);
+                } else {
+                    sortedScores.forEach((score, index) => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `<td>${index + 1}</td><td>${score.username}</td><td>${score.score}</td>`;
+                        scoreTable.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error("Error getting global scores: ", error);
+            }
+        }
+
+        async function getUploadedScoresFromFirebase() {
+            const highscoresRef = collection(db, "highscores");
+            const q = query(highscoresRef, orderBy("timestamp", "desc"));
+
+            try {
+                const snapshot = await getDocs(q);
+                const uploadedScores = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    uploadedScores.push({
+                        id: doc.id,
+                        username: data.username,
+                        score: data.score,
+                        timestamp: data.timestamp.toDate().toISOString()
+                    });
+                });
+
+                return uploadedScores;
+
+            } catch (error) {
+                console.error('Error fetching uploaded scores: ', error);
+                return [];
+            }
+        }
+
+        async function uploadLocalScoresToFirebase() {
+            const scores = JSON.parse(localStorage.getItem('allScores')) || [];
+            const uploadedScores = await getUploadedScoresFromFirebase();
+
+            if (scores.length === 0) {
+                console.log('No scores to upload.');
+                return;
+            }
+
+            const scoresRef = collection(db, "highscores");
+
+            try {
+                const newScores = scores.filter(score => {
+                    return !uploadedScores.some(uploaded => uploaded.timestamp === score.timestamp);
+                });
+
+                if (newScores.length === 0) {
+                    console.log('No new scores to upload.');
+                    return;
+                }
+
+                for (const score of newScores) {
+                    console.log('Uploading new score:', score);
+
+                    const existingScore = uploadedScores.find(uploaded => uploaded.username === score.username && uploaded.score === score.score);
+
+                    if (existingScore) {
+                        const docRef = doc(db, "highscores", existingScore.id);
+                        await updateDoc(docRef, {
+                            timestamp: Timestamp.fromDate(new Date(score.timestamp))
+                        });
+                        console.log("Updated timestamp for existing score.");
+                    } else {
+                        await addDoc(scoresRef, {
+                            username: score.username,
+                            score: score.score,
+                            timestamp: Timestamp.fromDate(new Date(score.timestamp))
+                        });
+                        console.log("Added new score.");
+                    }
+                }
+
+                console.log('New scores uploaded or updated to Firebase');
+
+            } catch (error) {
+                console.error('Error uploading scores: ', error);
+            }
+        }
+
+        window.onload = async function () {
+            // Populate local scores on page load
+            populateScores('local');
+
+            // Automatically upload local scores to Firebase
+            await uploadLocalScoresToFirebase();
+        };
+
+        // Attach functions to the global `window` object
+        window.switchTab = switchTab;
+        window.populateScores = populateScores;
+        window.getGlobalScoresFromFirebase = getGlobalScoresFromFirebase;
+        window.uploadLocalScoresToFirebase = uploadLocalScoresToFirebase;
+
+    </script>
+
+</body>
+
+</html>

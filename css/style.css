@@ -1,0 +1,581 @@
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  background: #f0f8ff;
+  /* Fallback background color */
+  backdrop-filter: blur(10px);
+  /* Apply blur effect */
+  animation: moveBackground 30s infinite ease-in-out;
+  /* Smooth animation for background movement */
+  overflow: hidden;
+  position: relative;
+}
+
+@keyframes moveBackground {
+  0% {
+    background-image: linear-gradient(45deg, rgba(0, 128, 0, 1) 0%, rgba(0, 102, 0, 1) 40%, rgba(0, 51, 0, 1) 70%, rgba(0, 0, 0, 1) 100%);
+  }
+
+  33% {
+    background-image: linear-gradient(45deg, rgba(0, 102, 0, 1) 0%, rgba(0, 51, 0, 1) 40%, rgba(0, 128, 0, 1) 70%, rgba(0, 0, 0, 1) 100%);
+  }
+
+  66% {
+    background-image: linear-gradient(45deg, rgba(0, 51, 0, 1) 0%, rgba(0, 0, 0, 1) 40%, rgba(0, 102, 0, 1) 70%, rgba(0, 128, 0, 1) 100%);
+  }
+
+  100% {
+    background-image: linear-gradient(45deg, rgba(0, 0, 0, 1) 0%, rgba(0, 51, 0, 1) 40%, rgba(0, 128, 0, 1) 70%, rgba(0, 102, 0, 1) 100%);
+  }
+}
+
+#game-container {
+  position: relative;
+  width: 80vw;
+  height: 80vw;
+  max-width: 500px;
+  max-height: 500px;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  border: 0.5px solid black;
+  overflow: hidden;
+  margin: 0 auto;
+  background-color: white;
+}
+
+.back-button {
+  position: absolute;
+  top: 6vw;
+  left: 6vw;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.back-button svg {
+  width: 30px;
+  height: 30px;
+  fill: #fff;
+}
+
+.back-button:hover {
+  transform: scale(1.1);
+}
+
+.snake-head {
+  background: linear-gradient(135deg, #2e8b57, #006400);
+  /* Deeper green with more natural gradient */
+  border-radius: 50%;
+  /* Keep it round */
+  width: 5vw;
+  /* Fixed size */
+  height: 5vw;
+  /* Fixed size */
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7), inset 0px 0px 3px rgba(0, 0, 0, 0.5);
+  /* Enhanced shadow for depth */
+  border-radius: 30%;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.5) 25%, rgba(0, 0, 0, 0) 60%);
+  /* Darker center for depth */
+}
+
+.snake-head:before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  /* Adjusted for positioning */
+  left: 5px;
+  /* Adjusted for positioning */
+  width: 5px;
+  /* Smaller eye for 20px head */
+  height: 5px;
+  /* Smaller eye for 20px head */
+  background-color: white;
+  border-radius: 50%;
+  /* Mimicking an eye */
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+  /* Smaller shadow */
+}
+
+.snake-head:after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  /* Adjusted for positioning */
+  left: 7px;
+  /* Adjusted for positioning */
+  width: 3px;
+  /* Smaller pupil for 20px head */
+  height: 3px;
+  /* Smaller pupil for 20px head */
+  background-color: black;
+  border-radius: 50%;
+  /* Small pupil */
+}
+
+.snake {
+  background: linear-gradient(135deg, #32CD32, #228B22);
+  /* Gradient for the body (snake green) */
+  width: 5vw;
+  height: 5vw;
+  position: absolute;
+  box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.4);
+  /* Adding depth */
+}
+
+.snake.transparent {
+  opacity: 0.5;
+}
+
+.snake-tail {
+  background: linear-gradient(135deg, #228B22, #006400);
+  /* Gradient for the tail (darker green) */
+  width: 5vw;
+  height: 5vw;
+  position: absolute;
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+  /* Slightly tapered tail */
+  transform-origin: center;
+  border-radius: 3px;
+}
+
+.food {
+  width: 5vw;
+  height: 5vw;
+  position: absolute;
+  border-radius: 50%;
+  background-color: red;
+}
+
+.heart-food {
+  width: 5vw;
+  height: 5vw;
+  position: absolute;
+  clip-path: polygon(50% 0%, 0% 35%, 50% 100%, 100% 35%);
+  background-color: blue;
+}
+
+#score {
+  font-size: 30px;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 2vh;
+  margin-top: 2vh;
+
+}
+
+
+.blink-border {
+  animation: blinkBorder 1s linear 0s infinite;
+}
+
+#button-place {
+  display: flex;
+  justify-content: space-between;
+  /* Space between buttons */
+  align-items: center;
+  /* Center vertically */
+  position: relative;
+  width: 80vw;
+  max-width: 500px;
+  /* Adjust width as needed */
+  height: auto;
+  /* Adjust height as needed */
+  margin-top: 2vh;
+  padding: 0 20px;
+  /* Add padding for spacing inside the container */
+}
+
+#mainBtn {
+  width: 12vw;
+  height: 12vw;
+  background: linear-gradient(45deg, rgb(21, 245, 21) 50%, rgb(11, 27, 11) 50%);
+  background-size: 200% 100%;
+  color: white;
+  text-shadow:
+    -1px -1px 0 black,
+    /* Top-left shadow */
+    1px -1px 0 black,
+    /* Top-right shadow */
+    -1px 1px 0 black,
+    /* Bottom-left shadow */
+    1px 1px 0 black;
+  /* Bottom-right shadow */
+  animation: gradient 3s infinite;
+  border: 0.5px solid black;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#pause-btn {
+  width: 12vw;
+  height: 12vw;
+  background: linear-gradient(45deg, rgb(21, 245, 21) 50%, rgb(11, 27, 11) 50%);
+  background-size: 200% 100%;
+  color: white;
+  text-shadow:
+    -1px -1px 0 black,
+    /* Top-left shadow */
+    1px -1px 0 black,
+    /* Top-right shadow */
+    -1px 1px 0 black,
+    /* Bottom-left shadow */
+    1px 1px 0 black;
+  /* Bottom-right shadow */
+  animation: gradient 3s infinite;
+  border: 0.5px solid black;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
+#pause-btn:hover {
+  background-color: #555555;
+}
+
+@keyframes blinkBorder {
+  0% {
+    border-color: white;
+  }
+
+  50% {
+    border-color: red;
+    /* Color of the border when it blinks */
+  }
+
+  100% {
+    border-color: white;
+  }
+}
+
+#mainBtn i {
+  font-size: 5vw;
+  transition: transform 0.5s ease;
+  /* Add smooth rotation effect */
+}
+
+.rotate-icon {
+  transform: rotate(90deg);
+  /* Rotate the icon */
+}
+
+#tableDrawer {
+  position: absolute;
+  top: 0;
+  left: 18vw;
+  /* Positioned relative to the Main button */
+  height: 11.5vw;
+  width: 0px;
+  /* Initially closed */
+  display: flex;
+
+  border-radius: 5px;
+  overflow: hidden;
+  /* Hide overflowing elements when closed */
+  transition: width 0.5s ease-in-out;
+  /* Smooth opening/closing */
+  z-index: 1;
+  gap: 0.5vw;
+  /* Add spacing between drawer buttons */
+}
+
+.drawerBtn {
+  flex: 1;
+  width: 12vw;
+  background: linear-gradient(45deg, rgb(21, 245, 21) 50%, rgb(11, 27, 11) 50%);
+  background-size: 200% 100%;
+  color: white;
+  text-shadow:
+    -1px -1px 0 black,
+    /* Top-left shadow */
+    1px -1px 0 black,
+    /* Top-right shadow */
+    -1px 1px 0 black,
+    /* Bottom-left shadow */
+    1px 1px 0 black;
+  /* Bottom-right shadow */
+  animation: gradient 3s infinite;
+  border: 0.5px solid black;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pause-Btn i,
+.drawerBtn i {
+  font-size: 5vw;
+  /* Adjust size of icons */
+}
+
+#control-place {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  flex-grow: 1;
+  position: relative;
+  margin-bottom: 20vw;
+}
+
+#joystick {
+  width: 50vw;
+  height: 50vw;
+  max-width: 200px;
+  max-height: 200px;
+  background: linear-gradient(135deg, rgba(0, 128, 0, 1) 60%, rgba(0, 51, 0, 1) 40%);
+  /* Gradient for the outer layer */
+  background-size: 200% 100%;
+  animation: joystick-gradient 3s infinite;
+  border-radius: 50%;
+  border: 0px solid rgba(0, 0, 0, 0.8);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Center horizontally */
+  box-shadow: inset 0 -3px 5px rgba(0, 51, 0, 0.5),
+    /* Inner shadow for depth */
+    0 6px 10px rgba(0, 0, 0, 0.7),
+    /* Outer shadow */
+    0 0 6px rgba(0, 255, 0, 0.5);
+  /* Outer glow effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.joystick-inner {
+  width: 30vw;
+  height: 30vw;
+  max-width: 100px;
+  max-height: 100px;
+  background: linear-gradient(225deg, rgba(0, 128, 0, 1) 60%,
+      rgba(0, 51, 0, 1) 40%);
+  /* Slightly darker green for the inner layer */
+  background-size: 200% 100%;
+  animation: joystick-gradient 3s infinite reverse;
+  /* Reversed animation for contrast */
+  border-radius: 50%;
+  border: 0px solid rgb(0, 0, 0.8);
+  box-shadow: inset 0 -3px 5px rgba(0, 51, 0, 0.5),
+    /* Inner shadow for depth */
+    0 6px 10px rgba(0, 0, 0, 0.7),
+    /* Outer shadow */
+    0 0 6px rgba(0, 255, 0, 0.5);
+  /* Outer glow effect */
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.joystick-ball {
+  width: 10vw;
+  height: 10vw;
+  max-width: 30px;
+  max-height: 30px;
+  background: linear-gradient(135deg, rgb(255, 30, 0), rgb(146, 4, 4));
+  /* Bright green for the ball */
+  border: 0px solid rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: inset 0 -3px 5px rgba(0, 51, 0, 0.8),
+    /* Inner shadow for depth */
+    0 4px 10px rgba(0, 0, 0, 0.5),
+    0 0 6px rgba(0, 0, 0, 0.8);
+  /* Glow effect */
+  transition: all 0.1s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Keyframe Animation */
+@keyframes joystick-gradient {
+  0% {
+    background-position: 200% 0;
+  }
+
+  33% {
+    background-position: 150% 25%;
+  }
+
+  66% {
+    background-position: 50% 75%;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
+#arrowControls {
+  display: grid;
+  justify-items: center;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Center horizontally */
+}
+
+#arrowControls button {
+  font-size: 24px;
+  width: 20vw;
+  height: 20vw;
+  max-width: 80px;
+  max-height: 80px;
+  text-shadow:
+    -1px -1px 1px rgba(0, 0, 0, 0.8),
+    1px -1px 1px rgba(0, 0, 0, 0.8),
+    -1px 1px 1px rgba(0, 0, 0, 0.8),
+    1px 1px 1px rgba(0, 0, 0, 0.8);
+  /* 3D text effect */
+  background-size: 200% 100%;
+  animation: joystick-gradient 3s infinite;
+  /* Smooth gradient animation */
+  color: white;
+  border: 0px solid rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 -3px 5px rgba(0, 51, 0, 0.5),
+    /* Inner shadow for depth */
+    0 6px 10px rgba(0, 0, 0, 0.7),
+    /* Outer shadow */
+    0 0 6px rgba(0, 255, 0, 0.5);
+  /* Outer glow */
+  transition: all 0.3s ease-in-out;
+}
+
+.arrow-btn i {
+  font-size: 28px;
+  /* Adjust size of icons */
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.7);
+  /* Subtle shadow for the icon */
+}
+
+#upArrow {
+  background: linear-gradient(135deg, rgba(0, 128, 0, 1) 60%, rgba(0, 51, 0, 1) 40%);
+  grid-row: 1;
+  grid-column: 2;
+}
+
+#downArrow {
+  background: linear-gradient(135deg, rgba(0, 128, 0, 1) 60%, rgba(0, 51, 0, 1) 40%);
+  grid-row: 3;
+  grid-column: 2;
+}
+
+#leftArrow {
+  background: linear-gradient(135deg, rgba(0, 102, 0, 1) 60%, rgba(0, 51, 0, 1) 40%);
+  grid-row: 2;
+  grid-column: 1;
+}
+
+#rightArrow {
+  background: linear-gradient(135deg, rgba(0, 102, 0, 1) 60%, rgba(0, 51, 0, 1) 40%);
+  grid-row: 2;
+  grid-column: 3;
+}
+
+/* Add a hover effect for buttons */
+#arrowControls button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 15px rgba(0, 255, 0, 0.7),
+    0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Style the modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 90%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Game over modal text */
+.modal h2 {
+  color: #f44336;
+  font-family: 'Arial', sans-serif;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.modal p {
+  font-size: 18px;
+  margin: 20px 0;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+}
+
+.modal button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.modal button:hover {
+  background-color: #45a049;
+}

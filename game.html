@@ -1,0 +1,74 @@
+<meta name='viewport' content='width=device-width, initial-scale=1' />
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&amp;display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>Snake Game</title>
+</head>
+
+<body>
+    <p id="score">0</p>
+    <button class="back-button" onclick="location.href='index.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+        </svg>
+    </button>
+    <div id="game-container">
+        <div class="snake" id="snake"></div>
+    </div>
+    <div id="button-place">
+        <button id="mainBtn">
+            <i class="fas fa-cog"></i> <!-- Settings icon -->
+        </button>
+        <button id="pause-btn" style="display: none;">
+            <i class="fas fa-pause"></i> <!-- Pause icon -->
+        </button>
+        <div id="tableDrawer">
+            <button class="drawerBtn" id="arrowBtn">
+                <i class="fas fa-arrows-alt"></i> <!-- Four directional arrows icon -->
+            </button>
+            <button class="drawerBtn" id="joystickBtn">
+                <i class="fas fa-gamepad"></i> <!-- Joystick icon -->
+            </button>
+        </div>
+    </div>
+    <div id="control-place">
+        <!-- Controls will be inserted here dynamically -->
+        <div id="arrowControls">
+            <button class="arrow-btn" id="upArrow">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            <button class="arrow-btn" id="leftArrow">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <button class="arrow-btn" id="rightArrow">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="arrow-btn" id="downArrow">
+                <i class="fas fa-arrow-down"></i>
+            </button>
+        </div>
+        <div class="joystick" id="joystick">
+            <div class="joystick-inner" id="joystickInner">
+                <button class="joystick-ball" id="joystickBall"></button>
+            </div>
+        </div>
+    </div>
+    <div id="game-over-modal" class="modal">
+        <div class="modal-content">
+            <h2>Game Over!</h2>
+            <p>Score: <span id="final-score"></span></p>
+            <button id="restart-btn" onclick="restartGame()">Restart</button>
+        </div>
+    </div>
+</body>
+
+<script src="js/script.js"></script>
+
+</html>

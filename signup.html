@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game Login</title>
+    <style>
+        html,
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, rgba(0, 128, 0, 1) 0%, rgba(0, 102, 0, 1) 40%, rgba(0, 51, 0, 1) 70%, rgba(0, 0, 0, 1) 100%);
+            color: #fff;
+            margin: 0;
+            /* Remove default margins */
+            padding: 0;
+            /* Remove default paddings */
+            height: 100%;
+            /* Ensure body and html cover full height */
+            display: flex;
+            /* Flexbox for centering */
+            align-items: center;
+            /* Center items vertically */
+            justify-content: center;
+            /* Center items horizontally */
+            flex-direction: column;
+        }
+
+        .auth-container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            /* Prevent it from being too wide */
+            box-sizing: border-box;
+            /* Include padding in width */
+        }
+
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1000;
+            /* Ensures the button stays on top of other elements */
+        }
+
+        .back-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover svg {
+            transform: scale(1.2);
+            /* Slightly enlarge the icon on hover */
+        }
+
+
+        h1 {
+            font-size: 10vw;
+            margin-bottom: 10px;
+            width: 80%;
+        }
+
+
+
+        .form-group {
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        #create-account-form {
+            display: block;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin: 10px 0 5px;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: rgba(0, 128, 0, 1);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .icon-container {
+            display: flex;
+            justify-content: space-evenly;
+            margin-top: 15px;
+        }
+
+        .icon-container img {
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .icon-container img:hover {
+            transform: scale(1.1);
+        }
+
+        #error-message {
+            color: #ff4c4c;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="back-button" onclick="location.href='index.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+        </svg>
+    </button>
+
+    <h1>Become<br>Legendary</h1>
+
+    <!-- Logout button, initially hidden -->
+    <button id="logout-button" style="display: none;">Logout</button>
+
+    <div class="auth-container">
+        <!-- Default Create Account Form -->
+        <form id="create-account-form" class="form-group">
+            <h2>Create Account</h2>
+            <label for="signup-display-name">Name:</label>
+            <input type="text" id="signup-display-name" placeholder="Enter Your Name" required autocomplete="name" />
+            <label for="signup-email">Email:</label>
+            <input type="email" id="signup-email" placeholder="Enter your email" required autocomplete="email" />
+            <label for="signup-password">Create Password:</label>
+            <input type="password" id="signup-password" placeholder="New password" required
+                autocomplete="new-password" />
+            <button type="submit" id="signup-submit">Sign Up</button>
+        </form>
+
+        <!-- Email/Password Sign-In Form -->
+        <form id="email-signin-form" class="form-group">
+            <h2>Sign In with Email</h2>
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Enter your email" required autocomplete="email" />
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Enter Your Password" required
+                autocomplete="current-password" />
+            <button type="submit" id="email-signin-submit">Sign In</button>
+            <button type="button" id="signup-button">Sign Up</button>
+        </form>
+
+        <!-- Guest Sign-In Form -->
+        <form id="guest-signin-form" class="form-group">
+            <h2>Play as Guest</h2>
+            <label for="guest-display-name">Name:</label>
+            <input type="text" id="guest-display-name" placeholder="Enter Your Name" required autocomplete="name" />
+            <button type="submit" id="guest-submit">Play</button>
+        </form>
+
+        <!-- Icon-Based Sign-In Options -->
+        <div class="icon-container">
+            <img src="img/email-icon.png" alt="Email Sign-In" id="email-signin-icon" title="Sign In with Email" />
+            <img src="img/google-icon.png" alt="Google Sign-In" id="google-signin-icon" title="Sign In with Google" />
+            <img src="img/guest-icon.png" alt="Guest Sign-In" id="guest-signin-icon" title="Play as Guest" />
+        </div>
+
+        <!-- Error Messages -->
+        <div id="error-message"></div>
+    </div>
+</body>
+<script type="module">
+    import {
+        auth,
+        db,
+        googleProvider,
+        signInWithPopup,
+        signInAnonymously,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        updateProfile,
+        setDoc,
+        doc
+    } from './js/firebaseConfig.js';
+
+    // On page load, check if the user is logged in by checking Firebase or localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+        const username = localStorage.getItem('username');  // Try to get the username from localStorage
+
+        const user = auth.currentUser;  // Check if a user is logged in via Firebase
+
+        if (user) {
+            // If the user is logged in via Firebase, fetch the username from Firestore
+            const userRef = doc(db, "users", user.uid);  // Reference to the user's document in Firestore
+            getDoc(userRef).then((docSnapshot) => {
+                if (docSnapshot.exists()) {
+                    const userData = docSnapshot.data();
+                    const displayName = userData.name || 'Player';  // Use 'Player' as default if no name exists
+
+                    // Save the username to localStorage for future use
+                    localStorage.setItem('username', displayName);
+
+                    // Display the welcome message with the username
+                    document.querySelector("h1").textContent = `Welcome ${displayName}!`;
+
+                    // Hide the auth form after login
+                    document.querySelector(".auth-container").style.display = 'none';
+                    document.getElementById("logout-button").style.display = 'inline'; // Show the logout button
+                }
+            }).catch((error) => {
+                console.error("Error fetching user data from Firestore:", error);
+            });
+        } else if (username) {
+            // If a username is found in localStorage, display the welcome message
+            document.querySelector("h1").textContent = `Welcome ${username}!`;
+            document.querySelector(".auth-container").style.display = 'none'; // Hide the auth form
+            document.getElementById("logout-button").style.display = 'inline'; // Show the logout button
+        } else {
+            // If no username is found in localStorage or Firebase, show the auth form
+            document.querySelector(".auth-container").style.display = 'block';
+            document.getElementById("logout-button").style.display = 'none'; // Hide the logout button
+        }
+
+        // Logout button click event
+        document.getElementById("logout-button").addEventListener("click", () => {
+            // Sign out the user
+            auth.signOut().then(() => {
+                // Clear localStorage
+                localStorage.removeItem('username');
+
+                // Show the auth form again and hide the logout button
+                document.querySelector(".auth-container").style.display = 'block';
+                document.getElementById("logout-button").style.display = 'none';
+
+                // Optionally, redirect to the sign-up or sign-in page
+                window.location.href = 'signup.html';  // Redirect to signup page (or wherever you'd like)
+            }).catch((error) => {
+                console.error("Error during logout:", error);
+            });
+        });
+    });
+
+
+    // Utility function to switch between forms
+    function switchForm(formId) {
+        document.querySelectorAll('.form-group').forEach(form => {
+            form.style.display = 'none';
+        });
+        document.getElementById(formId).style.display = 'block';
+    }
+
+    // Utility function to show error messages
+    function showError(message) {
+        const errorMessageElement = document.getElementById('error-message');
+        errorMessageElement.innerText = message;
+        errorMessageElement.style.display = 'block';
+    }
+
+    // Utility function to clear error messages
+    function clearError() {
+        const errorMessageElement = document.getElementById('error-message');
+        errorMessageElement.innerText = '';
+        errorMessageElement.style.display = 'none';
+    }
+
+    // Default to "Create Account" form
+    switchForm('create-account-form');
+
+    // Event Listeners for Icons
+    document.getElementById("email-signin-icon").addEventListener("click", () => {
+        clearError();
+        switchForm('email-signin-form');
+    });
+
+    //Google Sign in
+    document.getElementById("google-signin-icon").addEventListener("click", () => {
+        event.preventDefault(); // Prevent form submission
+        clearError();
+        signInWithPopup(auth, googleProvider)
+            .then((result) => {
+                const user = result.user;
+                const displayName = user.displayName || 'Player'; // Default to 'Player' if no display name is provided
+
+                // Store username in localStorage
+                localStorage.setItem('username', displayName);
+
+                // Change the <h1> text to welcome the user
+                document.querySelector("h1").textContent = `Welcome ${displayName}!`;
+
+                // Show welcome message with username
+                alert(`Welcome ${displayName}!`);
+
+                // Save user details in Firestore
+                return setDoc(doc(db, "users", user.uid), {
+                    name: displayName,
+                    email: user.email || "No Email",
+                    createdAt: new Date()
+                });
+            })
+            .then(() => {
+                // Redirect to index.html after Firestore update
+                window.location.href = 'index.html';  // This will take the user to index.html
+            })
+            .catch((error) => {
+                console.error("Google Sign-In Error:", error.message);
+                showError(error.message);
+            });
+    });
+
+
+    document.getElementById("guest-signin-icon").addEventListener("click", () => {
+        event.preventDefault(); // Prevent form submission
+        clearError();
+        switchForm('guest-signin-form');
+    });
+
+    //create accoungg
+    document.getElementById("signup-submit").addEventListener("click", () => {
+        event.preventDefault(); // Prevent form submission
+        clearError();
+        const email = document.getElementById("signup-email").value.trim();
+        const password = document.getElementById("signup-password").value.trim();
+        const displayName = document.getElementById("signup-display-name").value.trim();
+
+        if (!email || !password || !displayName) {
+            showError("All fields are required for sign up.");
+            return;
+        }
+
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+
+                // Update user profile with display name
+                return updateProfile(user, { displayName }).then(() => {
+                    // Save user details in Firestore
+                    return setDoc(doc(db, "users", user.uid), {
+                        name: displayName,
+                        email: user.email,
+                        createdAt: new Date()
+                    });
+                });
+            })
+            .then(() => {
+                // Automatically sign in after account creation
+                return signInWithEmailAndPassword(auth, email, password);
+            })
+            .then(() => {
+                alert("Account created and signed in successfully!");
+
+                // Save the username to localStorage
+                localStorage.setItem('username', displayName);
+
+                // Update the UI
+                document.querySelector("h1").textContent = `Welcome ${displayName}!`;
+
+                // Hide the auth container and show logout button
+                document.querySelector(".auth-container").style.display = 'none';
+                document.getElementById("logout-button").style.display = 'inline';
+
+                // Redirect to index.html after successful sign-in
+                window.location.href = 'index.html';  // This will take the user to index.html
+            })
+            .catch((error) => {
+                console.error("Sign-Up Error:", error.message);
+                showError(error.message);
+            });
+    });
+
+
+    // Guest Sign-In
+    document.getElementById("guest-submit").addEventListener("click", () => {
+        event.preventDefault(); // Prevent form submission
+        const displayName = document.getElementById("guest-display-name").value.trim();
+
+        if (!displayName) {
+            alert("Please enter your name.");
+            return;
+        }
+
+        signInAnonymously(auth)
+            .then(() => {
+                // Store the guest username in localStorage
+                localStorage.setItem('username', displayName);
+
+                // Change the <h1> text to welcome the user
+                document.querySelector("h1").textContent = `Welcome ${displayName}!`;
+
+                // Optionally store in Firebase
+                return setDoc(doc(db, "users", auth.currentUser.uid), {
+                    name: displayName,
+                    createdAt: new Date()
+                });
+            })
+            .then(() => {
+                alert(`Welcome Guest, ${displayName}!`);
+
+                // After the sign-in process, redirect to index.html
+                window.location.href = 'index.html';  // This will take the user to index.html
+            })
+            .catch((error) => {
+                console.error("Error during Guest Sign-In:", error);
+            });
+    });
+
+    // Email/Password Sign-In
+    document.getElementById("email-signin-submit").addEventListener("click", (event) => {
+        event.preventDefault(); // Prevent form submission
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                const displayName = user.displayName || 'Anonymous';
+
+                // Store in localStorage
+                localStorage.setItem('username', displayName);
+
+                // Change the <h1> text to welcome the user
+                document.querySelector("h1").textContent = `Welcome ${displayName}!`;
+
+                // Store in Firebase (if needed)
+                return setDoc(doc(db, "users", user.uid), {
+                    name: displayName,
+                    email: user.email,
+                    createdAt: new Date()
+                });
+            })
+            .then(() => {
+                alert(`Welcome back, ${localStorage.getItem('username')}!`);
+
+                // After the sign-in process, redirect to index.html
+                window.location.href = 'index.html';  // This will take the user to index.html
+            })
+            .catch((error) => {
+                console.error("Sign-In Error:", error.message);
+
+                // Check Firebase specific error codes for better feedback
+                let errorMessage = "An error occurred. Please try again."; // Default message
+
+                if (error.code === 'auth/invalid-login-credentials') {
+                    errorMessage = "incorrect Password.";
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = "Incorrect password. Please try again.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "The email address is not valid. Please check the format.";
+                }
+
+                // Display the error message on the page
+                showError(errorMessage);
+            });
+    });
+
+    // Switch to Create Account Form when "Sign Up" button is clicked
+    document.getElementById("signup-button").addEventListener("click", () => {
+        clearError();
+        switchForm('create-account-form');
+    });
+</script>
+
+
+
+</html>
