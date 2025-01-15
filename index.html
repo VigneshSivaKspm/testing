@@ -111,7 +111,6 @@
         }
     </style>
 </head>
-<body onclick="document.getElementById('background-music').muted = false;">
     
     <!-- Background Image -->
     <div id="background-image"></div>
@@ -138,60 +137,6 @@
     <div id="footer">
         <p>&#169; <span id="year"></span> LegendaryOne. All rights reserved.</p>
     </div>
-
-    <script>
-        // Set up Web Audio API to ensure autoplay works on page load
-        const audio = document.getElementById('background-music');
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioContext.createAnalyser();
-        const source = audioContext.createMediaElementSource(audio);
-        const yearElement = document.getElementById("year");
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-
-        analyser.fftSize = 256; // Set the FFT size (frequency data resolution)
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-
-        // Function to start audio when page loads
-        function startAudio() {
-            // Set the current year dynamically
-            const currentYear = new Date().getFullYear();
-            yearElement.textContent = currentYear;
-            audio.play().catch(error => {
-                console.log('Audio play failed:', error);
-            });
-            audioContext.resume().catch(error => {
-                console.log('Audio context resume failed:', error);
-            });
-            audio.muted = false; // Unmute the audio after the page loads
-            updateBackground(); // Start the background animation
-        }
-
-        // Add event listener for user interaction to start audio
-        document.addEventListener('click', startAudio, { once: true });
-        document.addEventListener('touchstart', startAudio, { once: true });
-
-        // Function to update the background image based on the audio data
-        function updateBackground() {
-            analyser.getByteFrequencyData(dataArray);
-
-            let sum = 0;
-            for (let i = 0; i < bufferLength; i++) {
-                sum += dataArray[i];
-            }
-            const average = sum / bufferLength;
-
-            // Map the average frequency to an effect on the background image
-            const scale = 1 + (average / 160) * 1; // Scale the background image
-
-            const backgroundImage = document.getElementById('background-image');
-            backgroundImage.style.transform = `scale(${scale})`;
-
-            requestAnimationFrame(updateBackground);
-        }
-
-    </script>
 </body>
 
 </html>
