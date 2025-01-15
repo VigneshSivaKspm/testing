@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -111,8 +112,7 @@
     </style>
 </head>
 
-<body>
-
+<body onclick="document.getElementById('background-music').muted = false;">
     <!-- Background Image -->
     <div id="background-image"></div>
     <div id="main-menu">
@@ -154,15 +154,23 @@
         const dataArray = new Uint8Array(bufferLength);
 
         // Function to start audio when page loads
-        window.onload = function () {
+        function startAudio() {
             // Set the current year dynamically
             const currentYear = new Date().getFullYear();
             yearElement.textContent = currentYear;
-            audio.play();
-            audioContext.resume(); // Ensure the audio context is resumed on load
+            audio.play().catch(error => {
+                console.log('Audio play failed:', error);
+            });
+            audioContext.resume().catch(error => {
+                console.log('Audio context resume failed:', error);
+            });
             audio.muted = false; // Unmute the audio after the page loads
             updateBackground(); // Start the background animation
-        };
+        }
+
+        // Add event listener for user interaction to start audio
+        document.addEventListener('click', startAudio, { once: true });
+        document.addEventListener('touchstart', startAudio, { once: true });
 
         // Function to update the background image based on the audio data
         function updateBackground() {
