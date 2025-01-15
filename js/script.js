@@ -1,4 +1,3 @@
-
 const gameContainer = document.getElementById('game-container');
 const scoreDisplay = document.getElementById('score');
 const gameOverSound = new Audio('./sounds/gameOver.mp3');
@@ -30,6 +29,38 @@ pauseButtonSound.volume = 1;
 mainBtnSound.volume = 1;
 selfBiteSound.volume = 1;
 
+// Function to start audio context and play sounds after user interaction
+function startAudioContext() {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const sounds = [
+        gameOverSound,
+        eatFoodSound,
+        specialPowerSound,
+        pauseButtonSound,
+        mainBtnSound,
+        selfBiteSound
+    ];
+
+    sounds.forEach(sound => {
+        const source = audioContext.createMediaElementSource(sound);
+        source.connect(audioContext.destination);
+    });
+
+    document.addEventListener('click', () => {
+        audioContext.resume().catch(error => {
+            console.log('Audio context resume failed:', error);
+        });
+    }, { once: true });
+
+    document.addEventListener('touchstart', () => {
+        audioContext.resume().catch(error => {
+            console.log('Audio context resume failed:', error);
+        });
+    }, { once: true });
+}
+
+// Call the function to set up audio context
+startAudioContext();
 
 function renderSnake() {
     gameContainer.innerHTML = ''; // Clear previous render
